@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Wedding Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Karla:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1f2a44;--mute:#5d6680;--line:#dfe3ea;--sage:#5f7f60;--blush:#f3d3d8;--acc:#b4475a;--on:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--card:#1d2540;--ink:#eef0f6;--mute:#a4adc6;--line:#2f3a5c;--sage:#9cbf9d;--blush:#4a2e3a;--acc:#e48a9b;--on:#141a2b}}
+:root[data-theme="dark"]{--bg:#141a2b;--card:#1d2540;--ink:#eef0f6;--mute:#a4adc6;--line:#2f3a5c;--sage:#9cbf9d;--blush:#4a2e3a;--acc:#e48a9b;--on:#141a2b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Karla,system-ui,sans-serif}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;margin:0}
+header{padding:40px 20px 24px;text-align:center;background:var(--blush)}
+header h1{font-size:clamp(2.2rem,7vw,3.8rem);line-height:1.05}
+header p{margin:8px 0 0;color:var(--mute)}
+.names{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+input,select,button,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+nav{display:flex;gap:4px;overflow-x:auto;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav button{border:0;background:none;padding:8px 14px;border-radius:20px;white-space:nowrap;cursor:pointer;color:var(--mute)}
+nav button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+main{max-width:860px;margin:0 auto;padding:24px 16px 60px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.stat{font-family:"Cormorant Garamond",serif;font-size:2.4rem;line-height:1}
+.mute{color:var(--mute);font-size:.9rem}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{padding:6px 4px;text-align:left;border-bottom:1px solid var(--line)}
+td input,td select{width:100%}
+.btn{background:var(--ink);color:var(--bg);border:0;cursor:pointer;padding:9px 16px}
+.x{border:0;background:none;color:var(--acc);cursor:pointer;padding:4px 8px}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--sage)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:6px 0}
+.chk input{width:20px;height:20px;margin-top:3px;accent-color:var(--sage)}
+.chk.done span{text-decoration:line-through;color:var(--mute)}
+h2{font-size:1.9rem;margin-bottom:12px}h3{font-size:1.35rem;margin:18px 0 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.over{color:var(--acc);font-weight:600}
+@media print{nav,header .names{display:none}section{display:block!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Our Wedding Planner</h1>
+  <p>Everything in one place, from the first idea to the last dance. Your changes save in this browser.</p>
+  <div class="names">
+    <input id="n1" placeholder="Partner one" aria-label="Partner one">
+    <input id="n2" placeholder="Partner two" aria-label="Partner two">
+    <input id="date" type="date" aria-label="Wedding date">
+  </div>
+</header>
+<nav role="tablist" id="nav"></nav>
+<main>
+<section id="overview"></section>
+<section id="checklist"></section>
+<section id="budget"></section>
+<section id="guests"></section>
+<section id="vendors"></section>
+<section id="day"></section>
+</main>
+<script>
+const TABS=[["overview","Overview"],["checklist","Checklist"],["budget","Budget"],["guests","Guest list"],["vendors","Vendors"],["day","Wedding day"]];
+const CHECK={"12+ months out":["Set a total budget and who contributes","Draft a guest count range","Choose a season and a few possible dates","Book your venue and lock the date","Start a shared inspiration board"],
+"9–11 months out":["Hire a photographer and videographer","Book a caterer or confirm venue catering","Choose an officiant","Reserve a block of hotel rooms","Hire a planner or day-of coordinator if wanted"],
+"6–8 months out":["Shop for attire and book fittings","Book a DJ or band","Order a florist proposal","Send save-the-dates","Plan the honeymoon and check passports"],
+"4–5 months out":["Order invitations","Book hair and makeup","Plan transport for guests and the couple","Choose rings","Arrange rentals: tables, linens, lighting"],
+"2–3 months out":["Send invitations with an RSVP deadline","Finalize the menu and arrange a tasting","Write or choose vows","Apply for the marriage license","Confirm every vendor in writing"],
+"1 month out":["Chase missing RSVPs","Build the seating chart","Give the caterer a final headcount","Do the final dress fitting","Write the day-of timeline and share it"],
+"Final week":["Pack for the honeymoon","Prepare vendor payments and tips in envelopes","Hand the emergency kit to a trusted friend","Rehearse the ceremony","Rest and eat well"]};
+const CATS=[["Venue",.30],["Catering and bar",.25],["Photo and video",.10],["Attire and beauty",.08],["Flowers and décor",.08],["Music and entertainment",.07],["Stationery and postage",.02],["Transport and lodging",.03],["Officiant and license",.01],["Miscellaneous buffer",.06]];
+const VCATS=["Venue","Caterer","Photographer","Videographer","Florist","DJ or band","Officiant","Hair and makeup","Baker","Transport","Planner"];
+const DAY=[["10:00","Hair and makeup begin"],["13:00","Photographer arrives, detail shots"],["15:00","Guests arrive and are seated"],["15:30","Ceremony"],["16:00","Cocktail hour and group photos"],["17:30","Reception entrance and first dance"],["18:00","Dinner and toasts"],["19:30","Cake cutting"],["20:00","Open dance floor"],["22:30","Send-off"]];
+let S;
+function def(){return{n1:"",n2:"",date:"",total:2000000,cur:"₹",checks:{},budget:CATS.map(c=>({n:c[0],est:null,act:0,pct:c[1]})),guests:[],vendors:[],day:DAY.map(d=>({t:d[0],e:d[1]})),notes:""}}
+try{S=JSON.parse(localStorage.getItem("wp-v1"))||def()}catch(e){S=def()}
+function save(){try{localStorage.setItem("wp-v1",JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>S.cur+Math.round(n).toLocaleString("en-IN");
+function tab(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));
+ document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===id));
+ try{history.replaceState(null,"","#"+id)}catch(e){}}
+$("nav").innerHTML=TABS.map(t=>`<button role="tab" data-t="${t[0]}">${t[1]}</button>`).join("");
+$("nav").onclick=e=>{if(e.target.dataset.t)tab(e.target.dataset.t)};
+function head(){const a=S.n1||"",b=S.n2||"";$("title").textContent=a&&b?`${a} & ${b}`:"Our Wedding Planner";document.title=$("title").textContent}
+["n1","n2","date"].forEach(k=>{$(k).value=S[k];$(k).oninput=()=>{S[k]=$(k).value;save();head();overview()}});
+function progress(){let t=0,d=0;for(const k in CHECK)CHECK[k].forEach((_,i)=>{t++;if(S.checks[k+i])d++});return[d,t]}
+function bTotals(){let e=0,a=0;S.budget.forEach(b=>{e+=b.est??S.total*b.pct;a+=+b.act||0});return[e,a]}
+function overview(){
+ let days="Set your date above";if(S.date){const n=Math.ceil((new Date(S.date+"T00:00")-new Date())/864e5);days=n>0?`${n} days to go`:n===0?"Today is the day":"Married "+(-n)+" days"}
+ const[d,t]=progress(),[e,a]=bTotals(),rs=S.guests.filter(g=>g.rsvp==="Yes").length;
+ $("overview").innerHTML=`<h2>At a glance</h2><div class="grid">
+ <div class="card"><div class="stat">${days.split(" ")[0]}</div><div class="mute">${days.split(" ").slice(1).join(" ")||"&nbsp;"}</div></div>
+ <div class="card"><div class="stat">${d}/${t}</div><div class="mute">checklist tasks done</div><div class="bar"><i style="width:${t?d/t*100:0}%"></i></div></div>
+ <div class="card"><div class="stat">${fmt(a)}</div><div class="mute">spent of ${fmt(S.total)} budget</div><div class="bar"><i style="width:${Math.min(100,a/S.total*100)}%"></i></div></div>
+ <div class="card"><div class="stat">${rs}</div><div class="mute">confirmed of ${S.guests.length} invited</div></div></div>
+ <div class="card"><h3>Notes and big decisions</h3><textarea id="notes" rows="6" style="width:100%" placeholder="Theme, colors, must-play songs, promises to family…">${esc(S.notes)}</textarea></div>
+ <div class="card"><h3>How to use this planner</h3><p>Start with your date and budget, work down the checklist by period, then fill in vendors and guests as decisions are made. Use the Print option in your browser to save any tab as a PDF.</p><button class="btn" onclick="window.print()">Print or save as PDF</button></div>`;
+ $("notes").oninput=e=>{S.notes=e.target.value;save()}}
+function checklist(){
+ $("checklist").innerHTML="<h2>Planning checklist</h2>"+Object.keys(CHECK).map(k=>`<div class="card"><h3>${k}</h3>`+CHECK[k].map((x,i)=>`<label class="chk ${S.checks[k+i]?"done":""}"><input type="checkbox" data-k="${k+i}" ${S.checks[k+i]?"checked":""}><span>${x}</span></label>`).join("")+"</div>").join("");
+ $("checklist").onchange=e=>{S.checks[e.target.dataset.k]=e.target.checked;save();checklist();overview()}}
+function budget(){
+ const[e,a]=bTotals();
+ $("budget").innerHTML=`<h2>Budget</h2><div class="card"><label>Total budget (${S.cur}) <input id="tot" type="number" min="0" value="${S.total}"></label>
+ <p class="mute">Estimates start as a typical share of your total. Edit any estimate to override it.</p>
+ <div class="grid"><div><div class="stat">${fmt(e)}</div><div class="mute">estimated</div></div><div><div class="stat">${fmt(a)}</div><div class="mute">spent</div></div><div><div class="stat ${e-a<0?"over":""}">${fmt(e-a)}</div><div class="mute">${e-a<0?"over budget":"remaining"}</div></div></div></div>
+ <div class="card scroll"><table><tr><th>Category</th><th>Estimate</th><th>Actual</th><th>Difference</th></tr>${S.budget.map((b,i)=>{const es=b.est??S.total*b.pct,df=es-(+b.act||0);return`<tr><td>${esc(b.n)}</td><td><input type="number" data-i="${i}" data-f="est" value="${Math.round(es)}"></td><td><input type="number" data-i="${i}" data-f="act" value="${b.act||""}" placeholder="0"></td><td class="${df<0?"over":""}">${fmt(df)}</td></tr>`}).join("")}</table></div>`;
+ $("tot").onchange=ev=>{S.total=+ev.target.value||0;S.budget.forEach(b=>b.est=null);save();budget();overview()};
+ $("budget").onchange=ev=>{const t=ev.target;if(t.dataset.f){S.budget[t.dataset.i][t.dataset.f]=t.value===""?(t.dataset.f==="est"?null:0):+t.value;save();budget();overview()}}}
+function guests(){
+ const c={Yes:0,No:0,Pending:0};S.guests.forEach(g=>c[g.rsvp]++);
+ $("guests").innerHTML=`<h2>Guest list</h2><div class="card"><div class="grid"><div><div class="stat">${S.guests.length}</div><div class="mute">invited</div></div><div><div class="stat">${c.Yes}</div><div class="mute">attending</div></div><div><div class="stat">${c.No}</div><div class="mute">declined</div></div><div><div class="stat">${c.Pending}</div><div class="mute">awaiting reply</div></div></div>
+ <div class="row"><input id="gn" placeholder="Guest name" aria-label="Guest name"><select id="gs" aria-label="Side"><option>Partner one</option><option>Partner two</option><option>Shared</option></select><button class="btn" id="ga">Add guest</button></div></div>
+ <div class="card scroll">${S.guests.length?`<table><tr><th>Name</th><th>Side</th><th>RSVP</th><th>Meal</th><th>Table</th><th></th></tr>${S.guests.map((g,i)=>`<tr><td>${esc(g.n)}</td><td>${esc(g.s)}</td><td><select data-i="${i}" data-f="rsvp">${["Pending","Yes","No"].map(o=>`<option ${o===g.rsvp?"selected":""}>${o}</option>`).join("")}</select></td><td><input data-i="${i}" data-f="meal" value="${esc(g.meal)}" placeholder="e.g. vegetarian"></td><td><input data-i="${i}" data-f="table" value="${esc(g.table)}" style="width:60px"></td><td><button class="x" data-del="${i}" aria-label="Remove ${esc(g.n)}">Remove</button></td></tr>`).join("")}</table>`:`<p class="mute">No guests yet. Add the first name above.</p>`}</div>`;
+ $("ga").onclick=()=>{const n=$("gn").value.trim();if(!n)return;S.guests.push({n,s:$("gs").value,rsvp:"Pending",meal:"",table:""});save();guests();overview()};
+ $("guests").onchange=e=>{const t=e.target;if(t.dataset.f){S.guests[t.dataset.i][t.dataset.f]=t.value;save();guests();overview()}};
+ $("guests").onclick=e=>{if(e.target.dataset.del!==undefined){S.guests.splice(e.target.dataset.del,1);save();guests();overview()}}}
+function vendors(){
+ $("vendors").innerHTML=`<h2>Vendors</h2><div class="card"><div class="row"><select id="vc" aria-label="Vendor type">${VCATS.map(v=>`<option>${v}</option>`).join("")}</select><input id="vn" placeholder="Business name" aria-label="Business name"><button class="btn" id="va">Add vendor</button></div></div>
+ <div class="card scroll">${S.vendors.length?`<table><tr><th>Type</th><th>Name</th><th>Contact</th><th>Cost</th><th>Status</th><th></th></tr>${S.vendors.map((v,i)=>`<tr><td>${esc(v.c)}</td><td>${esc(v.n)}</td><td><input data-i="${i}" data-f="contact" value="${esc(v.contact)}" placeholder="Phone or email"></td><td><input type="number" data-i="${i}" data-f="cost" value="${v.cost}" style="width:100px"></td><td><select data-i="${i}" data-f="st">${["Researching","Contacted","Booked","Deposit paid","Paid in full"].map(o=>`<option ${o===v.st?"selected":""}>${o}</option>`).join("")}</select></td><td><button class="x" data-del="${i}" aria-label="Remove ${esc(v.n)}">Remove</button></td></tr>`).join("")}</table>`:`<p class="mute">No vendors yet. Add your venue first, since it sets the date.</p>`}</div>`;
+ $("va").onclick=()=>{const n=$("vn").value.trim();if(!n)return;S.vendors.push({c:$("vc").value,n,contact:"",cost:"",st:"Researching"});save();vendors()};
+ $("vendors").onchange=e=>{const t=e.target;if(t.dataset.f){S.vendors[t.dataset.i][t.dataset.f]=t.value;save()}};
+ $("vendors").onclick=e=>{if(e.target.dataset.del!==undefined){S.vendors.splice(e.target.dataset.del,1);save();vendors()}}}
+function day(){
+ $("day").innerHTML=`<h2>Wedding day timeline</h2><div class="card scroll"><table><tr><th style="width:110px">Time</th><th>What happens</th><th></th></tr>${S.day.map((d,i)=>`<tr><td><input type="time" data-i="${i}" data-f="t" value="${d.t}"></td><td><input data-i="${i}" data-f="e" value="${esc(d.e)}"></td><td><button class="x" data-del="${i}" aria-label="Remove row">Remove</button></td></tr>`).join("")}</table><div class="row"><button class="btn" id="da">Add a row</button></div></div>
+ <div class="card"><h3>Emergency kit</h3><p class="mute">Pack safety pins, stain remover, pain relief, sewing kit, tissues, snacks, phone chargers, spare shoes, and printed vendor contacts.</p></div>`;
+ $("da").onclick=()=>{S.day.push({t:"12:00",e:""});save();day()};
+ $("day").onchange=e=>{const t=e.target;if(t.dataset.f){S.day[t.dataset.i][t.dataset.f]=t.value;if(t.dataset.f==="t"){S.day.sort((a,b)=>a.t.localeCompare(b.t));day()}save()}};
+ $("day").onclick=e=>{if(e.target.dataset.del!==undefined){S.day.splice(e.target.dataset.del,1);save();day()}}}
+head();overview();checklist();budget();guests();vendors();day();
+const h=location.hash.slice(1);tab(TABS.some(t=>t[0]===h)?h:"overview");
+</script>
+</body>
+</html>
